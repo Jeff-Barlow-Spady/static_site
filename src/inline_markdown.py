@@ -11,6 +11,17 @@ from textnode import (
 )
 
 def text_to_textnodes(text):
+    """
+    Convert a given text into a list of TextNode objects representing the text with different formatting.
+    
+    Args:
+        text (str): The input text to be converted.
+        
+    Returns:
+        list: A list of TextNode objects representing the text with different formatting.
+        
+    This function takes a given text as input and converts it into a list of TextNode objects. It first creates a single TextNode object with the input text and the text_type_text. Then, it applies different formatting delimiters such as "**" (bold), "*" (italic), and "`" (code) to the text by calling the split_nodes_delimiter function. It also splits the text into image and link nodes by calling the split_nodes_image and split_nodes_link functions respectively. Finally, it returns the list of TextNode objects representing the text with different formatting.
+    """
     nodes = [TextNode(text, text_type_text)]
     nodes = split_nodes_delimiter(nodes, "**", text_type_bold)
     nodes = split_nodes_delimiter(nodes, "*", text_type_italic)
@@ -20,6 +31,22 @@ def text_to_textnodes(text):
     return nodes
 
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
+    """
+    Split a list of TextNode objects into a new list of TextNode objects based on a given delimiter and text type.
+
+    Args:
+        old_nodes (list): A list of TextNode objects representing the original text.
+        delimiter (str): The delimiter used to split the text into sections.
+        text_type (str): The text type to assign to the sections that are split.
+
+    Returns:
+        list: A new list of TextNode objects representing the split text with different formatting.
+
+    Raises:
+        ValueError: If the number of sections after splitting is even, indicating an invalid markdown format.
+
+    This function takes a list of TextNode objects representing the original text and splits it into a new list of TextNode objects based on a given delimiter and text type. It iterates over each TextNode object in the old_nodes list and checks if its text_type is not equal to text_type_text. If it is not, the TextNode object is appended to the new_nodes list without modification. If it is, the text of the TextNode object is split into sections using the delimiter. If the number of sections after splitting is even, indicating an invalid markdown format, a ValueError is raised. The function then iterates over the sections and creates new TextNode objects with the appropriate text and text_type. The new TextNode objects are appended to the split_nodes list. Finally, the split_nodes list is extended into the new_nodes list and returned.
+    """
     new_nodes = []
     for old_node in old_nodes:
         if old_node.text_type != text_type_text:
@@ -41,6 +68,20 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
 
 
 def split_nodes_image(old_nodes):
+    """
+    Split a list of TextNode objects into a new list of TextNode objects based on image markdown.
+
+    Args:
+        old_nodes (list): A list of TextNode objects representing the original text.
+
+    Returns:
+        list: A new list of TextNode objects representing the split text with image markdown.
+
+    Raises:
+        ValueError: If the image section in the markdown is not closed.
+
+    This function takes a list of TextNode objects representing the original text and splits it into a new list of TextNode objects based on image markdown. It iterates over each TextNode object in the old_nodes list and checks if its text_type is not equal to text_type_text. If it is not, the TextNode object is appended to the new_nodes list without modification. If it is, the text of the TextNode object is checked for image markdown. If no image markdown is found, the TextNode object is appended to the new_nodes list. If image markdown is found, the text is split into sections using the image markdown. If the number of sections after splitting is not equal to 2, indicating an invalid markdown format, a ValueError is raised. The function then iterates over the sections and creates new TextNode objects with the appropriate text and text_type. The new TextNode objects are appended to the new_nodes list. Finally, the new_nodes list is returned.
+    """
     new_nodes = []
     for old_node in old_nodes:
         if old_node.text_type != text_type_text:
@@ -71,6 +112,20 @@ def split_nodes_image(old_nodes):
 
 
 def split_nodes_link(old_nodes):
+    """
+    Split a list of TextNode objects into a new list of TextNode objects based on link markdown.
+
+    Args:
+        old_nodes (list): A list of TextNode objects representing the original text.
+
+    Returns:
+        list: A new list of TextNode objects representing the split text with link markdown.
+
+    Raises:
+        ValueError: If the link section in the markdown is not closed.
+
+    This function takes a list of TextNode objects representing the original text and splits it into a new list of TextNode objects based on link markdown. It iterates over each TextNode object in the old_nodes list and checks if its text_type is not equal to text_type_text. If it is not, the TextNode object is appended to the new_nodes list without modification. If it is, the text of the TextNode object is checked for link markdown. If no link markdown is found, the TextNode object is appended to the new_nodes list. If link markdown is found, the text is split into sections using the link markdown. If the number of sections after splitting is not equal to 2, indicating an invalid markdown format, a ValueError is raised. The function then iterates over the sections and creates new TextNode objects with the appropriate text and text_type. The new TextNode objects are appended to the new_nodes list. Finally, the new_nodes list is returned.
+"""
     new_nodes = []
     for old_node in old_nodes:
         if old_node.text_type != text_type_text:
@@ -95,12 +150,44 @@ def split_nodes_link(old_nodes):
 
 
 def extract_markdown_images(text):
+    """
+    Extracts markdown images from the given text.
+
+    Args:
+        text (str): The text to extract markdown images from.
+
+    Returns:
+        List[Tuple[str, str]]: A list of tuples containing the alt text and the URL of each markdown image found in the text.
+
+    Raises:
+        None
+
+    Example:
+        >>> extract_markdown_images("![alt text](https://example.com/image.jpg)")
+        [('alt text', 'https://example.com/image.jpg')]
+    """
     pattern = r"!\[(.*?)\]\((.*?)\)"
     matches = re.findall(pattern, text)
     return matches
 
 
 def extract_markdown_links(text):
+    """
+    Extracts markdown links from the given text.
+
+    Args:
+        text (str): The text to extract markdown links from.
+
+    Returns:
+        List[Tuple[str, str]]: A list of tuples containing the link text and the URL of each markdown link found in the text.
+
+    Raises:
+        None
+
+    Example:
+        >>> extract_markdown_links("[link text](https://example.com)")
+        [('link text', 'https://example.com')]
+    """
     pattern = r"\[(.*?)\]\((.*?)\)"
     matches = re.findall(pattern, text)
     return matches
