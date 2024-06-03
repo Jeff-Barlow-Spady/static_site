@@ -31,9 +31,9 @@ class LeafNode(HTMLNode):
             raise ValueError("Leaf nodes require a value.")
         if self.tag is None:
             return self.value
+        if self.tag in ["img", "br", "hr", "input", "meta", "link"]:  # Add more self-closing tags as needed
+            return f"<{self.tag}{self.props_to_html()} />"
         return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
-
-
   
 class ParentNode(HTMLNode):
     def __init__(self, tag=None, children=None, props=None):
