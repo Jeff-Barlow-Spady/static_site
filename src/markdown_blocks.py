@@ -8,7 +8,7 @@ block_type_code = "code"
 block_type_quote = "quote"
 block_type_ulist = "unordered_list"
 block_type_olist = "ordered_list"
-
+block_type_image = "image"
 
 def markdown_to_blocks(markdown):
     """
@@ -80,6 +80,7 @@ def block_to_block_type(block):
             - "unordered_list" if the block is an unordered list.
             - "ordered_list" if the block is an ordered list.
             - "paragraph" if the block is a regular paragraph.
+            - "image" if the block is an image
 
     This function takes a block of text and checks its format to determine its type. It uses regular expressions to match the block against different patterns for headings, code blocks, quote blocks, unordered lists, and ordered lists. If none of these patterns match, it assumes the block is a regular paragraph.
 
@@ -107,6 +108,10 @@ def block_to_block_type(block):
     unordered_list_match = re.match(r'^[\*\-]\s+.*', block, re.MULTILINE)
     if unordered_list_match:
         return block_type_ulist
+    
+    image_match = re.match(r'!\[.*?\]\((.*?)\)', block, re.MULTILINE)
+    if image_match:
+        return block_type_image
 
     # Check for ordered list blocks
     ordered_list_match = re.match(r'^1\.\s+.*', block, re.MULTILINE)
@@ -143,8 +148,38 @@ def block_to_html_node(block):
         return ulist_to_html_node(block)
     elif block_type == block_type_olist:
         return olist_to_html_node(block)
+    elif block_type == "image":
+        return image_to_html_node(block)
     else:
         raise ValueError(f"Invalid block type: {block_type}")
+
+
+def image_to_html_node(block):
+    """
+    Convert an image block to an HTML img node.
+
+    Args:
+        block (str): The image block to convert.
+
+    Returns:
+        ParentNode: The HTML img node representing the image block.
+
+    Raises:
+        ValueError: If the image block is invalid or does not match the pattern.
+    """
+    pattern = r'!\[.*?\]\((.*?)\)'
+    match = re.match(pattern, block)
+    if not match:
+        raise ValueError("Invalid image block")
+
+    src = match.group(1)
+    if not src:
+        raise ValueError("Invalid image block: no src attribute")
+
+    return ParentNode("img", [], {"src": src})
+
+
+
     
 
 def text_to_children(text):
@@ -207,6 +242,19 @@ def ulist_to_html_node(block):
 
 
 def quote_to_html_node(block):
+    """
+    Convert a quote block to an HTML blockquote node.
+
+    Args:
+        block (str): The quote block to convert.
+
+    Returns:
+        ParentNode: The HTML blockquote node representing the quote block.
+
+    Raises:
+        ValueError: If the quote block is invalid.
+
+    """
     lines = block.split("\n")
     new_lines = []
     for line in lines:

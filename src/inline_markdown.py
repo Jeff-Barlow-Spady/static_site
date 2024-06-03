@@ -110,7 +110,6 @@ def split_nodes_image(old_nodes):
             new_nodes.append(TextNode(original_text, text_type_text))
     return new_nodes
 
-
 def split_nodes_link(old_nodes):
     """
     Split a list of TextNode objects into a new list of TextNode objects based on link markdown.

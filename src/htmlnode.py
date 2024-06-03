@@ -20,6 +20,7 @@ class HTMLNode:
     def __repr__(self):
         return f"HTMLNode({self.tag}, {self.value}, {self.children}, {self.props})"
 
+
 class LeafNode(HTMLNode):
     def __init__(self, tag=None, value=None, props=None):
         if value is None:
@@ -31,16 +32,23 @@ class LeafNode(HTMLNode):
             raise ValueError("Leaf nodes require a value.")
         if self.tag is None:
             return self.value
+        if self.tag in [
+            "img",
+            "br",
+            "hr",
+            "input",
+            "meta",
+            "link",
+        ]:  # Add more self-closing tags as needed
+            return f"<{self.tag}{self.props_to_html()} />"
         return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
 
 
-  
 class ParentNode(HTMLNode):
     def __init__(self, tag=None, children=None, props=None):
         self.tag = tag
         self.children = children
         self.props = props
-
 
     def to_html(self):
         if self.tag is None:
@@ -56,6 +64,6 @@ class ParentNode(HTMLNode):
         for props in self.props:
             props_html += f' {props}="{self.props[props]}"'
         return f"<{self.tag}{props_html}>{children}</{self.tag}>"
-    
+
     def __repr__(self):
         return f"ParentNode({self.tag}, {self.children}, {self.props})"

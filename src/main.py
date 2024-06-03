@@ -1,7 +1,7 @@
 import os
 import shutil
 from copy_static import copy_files_recursive
-from generate import generate_pages_recursive, generate_and_traverse, generate_page
+from generate import generate_pages_recursive#, generate_and_traverse, generate_page
 # Define directories for static and public files
 dir_static = "./static"
 dir_public = "./public"
@@ -16,6 +16,14 @@ CONTENT_DIR = "./content"
 
 # Main function to delete and recreate public directory, copy static files, and generate the page
 def main():
+    """
+    Deletes the public directory, recreates it, and copies static files to it.
+    Then generates HTML pages from markdown files using the specified template.
+    
+    This function does not take any parameters.
+    
+    This function does not return anything.
+    """
     print("Deleting Public Directory")
     if os.path.exists(dir_public):
         shutil.rmtree(dir_public)
