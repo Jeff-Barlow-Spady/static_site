@@ -6,7 +6,7 @@ from http.server import HTTPServer, SimpleHTTPRequestHandler
 def run(
     server_class=HTTPServer,
     handler_class=SimpleHTTPRequestHandler,
-    port=8000,
+    port=8888,
     directory='.',
 ):
     if directory:  # Change the current working directory if directory is specified
@@ -22,7 +22,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--dir", type=str, help="Directory to serve files from", default="."
     )
-    parser.add_argument("--port", type=int, help="Port to serve HTTP on", default=8000)
+    parser.add_argument("--port", type=int, help="Port to serve HTTP on", default=8888)
     args = parser.parse_args()
 
     run(port=args.port, directory=args.dir)
