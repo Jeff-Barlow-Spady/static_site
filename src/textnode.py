@@ -24,17 +24,17 @@ class TextNode:
         return f"TextNode({self.text}, {self.text_type}, {self.url})"
         
 def text_node_to_html_node(text_node):
-    if text_node.type == "text":
+    if text_node.text_type == "text":
         return LeafNode(None, text_node.text)
-    if text_node.type == "bold":
+    if text_node.text_type == "bold":
         return LeafNode("b", text_node.text)
-    if text_node.type == "italic":
+    if text_node.text_type == "italic":
         return LeafNode("i", text_node.text)
-    if text_node.type == "code":
+    if text_node.text_type == "code":
         return LeafNode("code", text_node.text)
-    if text_node.type == "link":
+    if text_node.text_type == "link":
         return LeafNode("a", text_node.text, {"href": text_node.href})
-    if text_node.type == "image":
+    if text_node.text_type == "image":
         return LeafNode("img", "", {"src": text_node.src, "alt": text_node.alt})
     raise Exception('Unknown text type')
 
