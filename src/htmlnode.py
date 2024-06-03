@@ -1,4 +1,13 @@
 class HTMLNode:
+    """
+    Base class for HTML nodes.
+
+    Attributes:
+        tag (str): The HTML tag for the node.
+        value (str): The value or content of the node.
+        children (list): A list of child nodes.
+        props (dict): A dictionary of HTML attributes and their values.
+    """
     def __init__(self, tag=None, value=None, children=None, props=None):
         self.tag = tag
         self.value = value
@@ -6,9 +15,24 @@ class HTMLNode:
         self.props = props
 
     def to_html(self):
+        """
+        Convert the node to an HTML string.
+
+        Raises:
+            NotImplementedError: This method should be implemented by subclasses.
+        """
         raise NotImplementedError
 
     def props_to_html(self):
+        """
+        Convert the props dictionary to an HTML attribute string.
+
+        Returns:
+            str: A string representing the HTML attributes.
+
+        Raises:
+            InvalidPropsError: If the props dictionary contains invalid keys or values.
+        """
         if self.props is None:
             return ""
         props_html = ""
@@ -22,12 +46,29 @@ class HTMLNode:
 
 
 class LeafNode(HTMLNode):
+    """
+    A leaf node in the HTML tree, representing a self-closing or text node.
+
+    Attributes:
+        tag (str): The HTML tag for the node.
+        value (str): The value or content of the node.
+        props (dict): A dictionary of HTML attributes and their values.
+    """
     def __init__(self, tag=None, value=None, props=None):
         if value is None:
             raise ValueError("Leaf nodes require a value.")
         super().__init__(tag, value, None, props)
 
     def to_html(self):
+        """
+        Convert the leaf node to an HTML string.
+
+        Returns:
+            str: The HTML string representation of the leaf node.
+
+        Raises:
+            ValueError: If the leaf node has no value.
+        """
         if self.value is None:
             raise ValueError("Leaf nodes require a value.")
         if self.tag is None:
@@ -45,6 +86,14 @@ class LeafNode(HTMLNode):
 
 
 class ParentNode(HTMLNode):
+    """
+    A parent node in the HTML tree, containing child nodes.
+
+    Attributes:
+        tag (str): The HTML tag for the node.
+        children (list): A list of child nodes.
+        props (dict): A dictionary of HTML attributes and their values.
+    """
     def __init__(self, tag=None, children=None, props=None):
         self.tag = tag
         self.children = children
