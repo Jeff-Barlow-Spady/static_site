@@ -1,42 +1,61 @@
 import os
 import argparse
-from http.server import HTTPServer, SimpleHTTPRequestHandler
 import socket
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
+import uvicorn
+from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+import sys
 
-def run(
-    server_class=HTTPServer,
-    handler_class=SimpleHTTPRequestHandler,
-    port=8888,
-    directory='.',
-):
-    # Find an available port
+# Define the FastAPI app
+app = FastAPI()
+
+# Mount the static files directory
+static_dir = os.path.join(os.path.dirname(__file__), "public")
+app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
+
+class HotReloadHandler(FileSystemEventHandler):
+    def __init__(self):
+        super().__init__()
+
+    def on_any_event(self, event):
+        print("Change detected. Restarting server...")
+        os.execv(sys.executable, [sys.executable] + sys.argv)
+
+def find_available_port(port):
     while True:
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 s.bind(("localhost", port))
                 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-                break
+                return port
         except OSError:
             port += 1
 
-    if directory:  # Change the current working directory if directory is specified
-        os.chdir(directory)
-    server_address = ("", port)
-    httpd = server_class(server_address, handler_class)
-    print(f"Serving HTTP on http://localhost:{port} from directory '{directory}'...")
-    httpd.serve_forever()
-
-
-
-
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="HTTP Server")
-    parser.add_argument(
-        "--dir", type=str, help="Directory to serve files from", default="."
-    )
-    parser.add_argument("--port", type=int, help="Port to serve HTTP on", default=8888)
+def main():
+    parser = argparse.ArgumentParser(description="Start an ASGI server with hot-reloading.")
+    parser.add_argument("--port", type=int, default=8888, help="Port number")
+    parser.add_argument("--directory", type=str, default="public", help="Directory to serve")
     args = parser.parse_args()
 
-    run(port=args.port, directory=args.dir)
+    port = find_available_port(args.port)
+    directory = args.directory
+
+    # Set up the watchdog observer
+    event_handler = HotReloadHandler()
+    observer = Observer()
+    observer.schedule(event_handler, path=directory, recursive=True)
+    observer.start()
+
+    try:
+        # Start the uvicorn server with the correct import string
+        uvicorn.run("server:app", host="0.0.0.0", port=port, reload=True, reload_dirs=[directory])
+    except KeyboardInterrupt:
+        pass
+    finally:
+        observer.stop()
+        observer.join()
+
+if __name__ == "__main__":
+    main()
