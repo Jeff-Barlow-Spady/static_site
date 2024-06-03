@@ -78,7 +78,7 @@ This project is part of a course from [Boot.dev](https://boot.dev/).
 
 ## Examples
 
-![GIF of generated site](https://videoapi-muybridge.vimeocdn.com/animated-thumbnails/image/34eebd8a-2e3b-48c9-bf89-2b82123b1fb9.gif?ClientID=sulu&Date=1717441020&Signature=89cc8b316cb38c52ac9d2c2c49fa63bc4e232b12)
+![GIF of generated site](gif_preview.gif)
 
 ```markdown
 # The Unparalleled Majesty of "The Lord of the Rings"
@@ -105,12 +105,12 @@ One cannot simply discuss *The Lord of the Rings* without acknowledging the bedr
 2. The tragic saga of the Noldor Elves
 3. The rise and fall of great kingdoms such as Gondolin and Númenor
 
-```
-print("Lord")
-print("of")
-print("the")
-print("Rings")
-```
+    ```python
+    print("Lord")
+    print("of")
+    print("the")
+    print("Rings")
+    ```
 
 ## The Art of **World-Building**
 
