@@ -1,0 +1,7 @@
+# config.yaml
+source_dir: "./content"
+output_dir: "./public"
+templates_dir: "./src/templates"
+static_dir: "./src/static"
+template: "base.html"
+port: 8888

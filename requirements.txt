@@ -1,0 +1,8 @@
+PyYAML
+fastapi
+uvicorn
+watchdog
+jinja2
+rcssmin
+rjsmin
+markdown
