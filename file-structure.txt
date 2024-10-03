@@ -1,0 +1,34 @@
+.
+├── app.py
+├── content
+│   ├── index.md
+│   └── majesty
+│       └── index.md
+├── file-structure.txt
+├── gif_preview.gif
+├── .gitignore
+├── main.sh
+├── README.md
+├── requirements.txt
+├── server.py
+├── src
+│   ├── copy_static.py
+│   ├── generate.py
+│   ├── htmlnode.py
+│   ├── inline_markdown.py
+│   ├── main.py
+│   ├── markdown_blocks.py
+│   ├── scratch.ipynb
+│   ├── test_htmlnode.py
+│   ├── test_inline_markdown.py
+│   ├── test_markdown_blocks.py
+│   ├── test_textnode.py
+│   └── textnode.py
+├── static
+│   ├── images
+│   │   └── rivendell.png
+│   └── index.css
+├── template.html
+└── tests.sh
+
+6 directories, 26 files
