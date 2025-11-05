@@ -193,9 +193,16 @@ def generate_page(FROM_PATH, TEMPLATE_PATH, DEST_PATH, basepath="/"):
         template = template.replace("{{ Title }}", title)
         template = template.replace("{{ Content }}", html_content)
 
-        # Replace href="/ and src="/ with basepath
-        template = template.replace('href="/', f'href="{basepath}')
-        template = template.replace('src="/', f'src="{basepath}')
+        # Replace href="/ and src="/ with basepath (only when basepath is not "/")
+        # Only replace absolute paths, not external URLs (http/https)
+        if basepath != "/":
+            import re
+            # Ensure basepath ends with / for clean replacement
+            basepath_clean = basepath if basepath.endswith('/') else basepath + '/'
+            # Replace href="/path with href="{basepath}path (but not href="http or href="https)
+            template = re.sub(r'href="/(?!https?://)', f'href="{basepath_clean}', template)
+            # Replace src="/path with src="{basepath}path (but not src="http or src="https)
+            template = re.sub(r'src="/(?!https?://)', f'src="{basepath_clean}', template)
     except Exception as e:
         print(f"Error: Unable to replace placeholders in template '{TEMPLATE_PATH}'. {e}")
         return
