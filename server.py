@@ -12,7 +12,7 @@ import sys
 app = FastAPI()
 
 # Mount the static files directory
-static_dir = os.path.join(os.path.dirname(__file__), "public")
+static_dir = os.path.join(os.path.dirname(__file__), "docs")
 app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
 
 class HotReloadHandler(FileSystemEventHandler):
@@ -47,7 +47,7 @@ def find_available_port(port):
 def main():
     parser = argparse.ArgumentParser(description="Start an ASGI server with hot-reloading.")
     parser.add_argument("--port", type=int, default=8888, help="Port number")
-    parser.add_argument("--directory", type=str, default="public", help="Directory to serve")
+    parser.add_argument("--directory", type=str, default="docs", help="Directory to serve")
     args = parser.parse_args()
 
     port = find_available_port(args.port)

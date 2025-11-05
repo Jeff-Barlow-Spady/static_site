@@ -130,7 +130,7 @@ def generate_and_traverse(src_dir, dest_dir, template_path):
                 print("=" * 94)
 
 # Function to generate the HTML page from markdown and template
-def generate_page(FROM_PATH, TEMPLATE_PATH, DEST_PATH):
+def generate_page(FROM_PATH, TEMPLATE_PATH, DEST_PATH, basepath="/"):
     """
     Generates an HTML page from a markdown file and a template file, and writes it to a destination path.
 
@@ -138,16 +138,17 @@ def generate_page(FROM_PATH, TEMPLATE_PATH, DEST_PATH):
         FROM_PATH (str): The path to the markdown file.
         TEMPLATE_PATH (str): The path to the template file.
         DEST_PATH (str): The path to the destination file.
+        basepath (str): The base path for the site (defaults to /).
 
     Returns:
         None
 
-    This function reads the content of the markdown file, reads the content of the template file, converts the markdown to HTML, extracts the title from the markdown content, replaces placeholders in the template with the title and HTML content, and writes the output HTML to the destination file. If any error occurs during the process, an error message is printed to the console.
+    This function reads the content of the markdown file, reads the content of the template file, converts the markdown to HTML, extracts the title from the markdown content, replaces placeholders in the template with the title and HTML content, replaces href="/ and src="/ with basepath, and writes the output HTML to the destination file. If any error occurs during the process, an error message is printed to the console.
 
     Example:
-        >>> generate_page("./content/index.md", "template.html", "public/index.html")
+        >>> generate_page("./content/index.md", "template.html", "docs/index.html", "/")
         ================================================================================
-        Generating page from ./content/index.md to public/index.html using template.html
+        Generating page from ./content/index.md to docs/index.html using template.html
         ================================================================================
         ================================================================================
         PAGE GENERATED SUCCESSFULLY
@@ -191,6 +192,10 @@ def generate_page(FROM_PATH, TEMPLATE_PATH, DEST_PATH):
     try:
         template = template.replace("{{ Title }}", title)
         template = template.replace("{{ Content }}", html_content)
+
+        # Replace href="/ and src="/ with basepath
+        template = template.replace('href="/', f'href="{basepath}')
+        template = template.replace('src="/', f'src="{basepath}')
     except Exception as e:
         print(f"Error: Unable to replace placeholders in template '{TEMPLATE_PATH}'. {e}")
         return
@@ -241,7 +246,7 @@ def traverse_and_generate(src_dir, dest_dir, template_path):
                 dest_path = os.path.join(dest_dir, os.path.splitext(relative_path)[0] + ".html")
                 generate_page(markdown_path, template_path, dest_path)
 
-def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, basepath="/"):
     """
     Generate HTML pages recursively from markdown files in the given directory and copy them to the destination directory using the specified template.
 
@@ -249,6 +254,7 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
         dir_path_content (str): The path to the directory containing the markdown files.
         template_path (str): The path to the template file.
         dest_dir_path (str): The path to the destination directory where the generated HTML pages will be copied.
+        basepath (str): The base path for the site (defaults to /).
 
     Returns:
         None
@@ -259,14 +265,14 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
     This function iterates over the files in the given directory and its subdirectories. For each file, it checks if it is a markdown file. If it is, it generates an HTML page from the markdown file using the specified template and copies it to the destination directory. If the file is not a markdown file, it recursively calls itself with the file path as the directory path and the same template and destination paths.
 
     Example:
-        >>> generate_pages_recursive("./content", "template.html", "./public")
-        # Generates HTML pages from markdown files in the "./content" directory and copies them to the "./public" directory using the "template.html" template.
+        >>> generate_pages_recursive("./content", "template.html", "./docs", "/")
+        # Generates HTML pages from markdown files in the "./content" directory and copies them to the "./docs" directory using the "template.html" template.
     """
     for filename in os.listdir(dir_path_content):
         from_path = os.path.join(dir_path_content, filename)
         dest_path = os.path.join(dest_dir_path, filename)
         if os.path.isfile(from_path):
             dest_path = Path(dest_path).with_suffix(".html")
-            generate_page(from_path, template_path, dest_path)
+            generate_page(from_path, template_path, dest_path, basepath)
         else:
-            generate_pages_recursive(from_path, template_path, dest_path)
+            generate_pages_recursive(from_path, template_path, dest_path, basepath)
