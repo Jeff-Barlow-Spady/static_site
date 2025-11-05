@@ -1,12 +1,13 @@
 from htmlnode import LeafNode
+from enum import Enum
 
-# Define text types
-text_type_text = "text"
-text_type_bold = "bold"
-text_type_italic = "italic"
-text_type_code = "code"
-text_type_link = "link"
-text_type_image = "image"
+class TextType(Enum):
+    TEXT = "text"
+    BOLD = "bold"
+    ITALIC = "italic"
+    CODE = "code"
+    LINK = "link"
+    IMAGE = "image"
 
 class TextNode:
     def __init__(self, text, text_type, url=None, src=None, alt=None):
@@ -15,7 +16,7 @@ class TextNode:
 
         Args:
             text (str): The text content of the node.
-            text_type (str): The type of text node.
+            text_type (enum.Enum): The type of text node.
             url (str, optional): The URL associated with the text node. Defaults to None.
             src (str, optional): The source of the text node. Defaults to None.
             alt (str, optional): The alternative text for the text node. Defaults to None.
@@ -37,8 +38,11 @@ class TextNode:
         )
 
     def __repr__(self):
-        return f"TextNode({self.text}, {self.text_type}, {self.url}, {self.src}, {self.alt})"
-        
+        parts = [self.text, self.text_type.value]
+        if self.url is not None:
+            parts.append(self.url)
+        return f"TextNode({', '.join(str(p) for p in parts)})"
+
 def text_node_to_html_node(text_node):
     """
     Converts a TextNode instance to an HTMLNode instance based on the text type.
@@ -54,17 +58,17 @@ def text_node_to_html_node(text_node):
 
     This function takes a TextNode instance and converts it to an HTMLNode instance based on the text type. If the text type is text_type_text, it returns a LeafNode with the text content. If the text type is text_type_bold, it returns a LeafNode with the text content wrapped in a <b> tag. If the text type is text_type_italic, it returns a LeafNode with the text content wrapped in an <i> tag. If the text type is text_type_code, it returns a LeafNode with the text content wrapped in a <code> tag. If the text type is text_type_link, it returns a LeafNode with the text content wrapped in an <a> tag with the href attribute set to the URL. If the text type is text_type_image, it returns a LeafNode with the text content wrapped in an <img> tag with the src and alt attributes set. If the text type is unknown, it raises an exception.
     """
-    if text_node.text_type == text_type_text:
+    if text_node.text_type == TextType.TEXT:
         return LeafNode(None, text_node.text)
-    elif text_node.text_type == text_type_bold:
+    elif text_node.text_type == TextType.BOLD:
         return LeafNode("b", text_node.text)
-    elif text_node.text_type == text_type_italic:
+    elif text_node.text_type == TextType.ITALIC:
         return LeafNode("i", text_node.text)
-    elif text_node.text_type == text_type_code:
+    elif text_node.text_type == TextType.CODE:
         return LeafNode("code", text_node.text)
-    elif text_node.text_type == text_type_link:
+    elif text_node.text_type == TextType.LINK:
         return LeafNode("a", text_node.text, {"href": text_node.url})
-    elif text_node.text_type == text_type_image:
+    elif text_node.text_type == TextType.IMAGE:
         return LeafNode("img", "", {"src": text_node.src, "alt": text_node.alt})
     else:
         raise Exception('Unknown text type')

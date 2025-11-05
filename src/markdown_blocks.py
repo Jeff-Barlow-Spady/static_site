@@ -10,6 +10,7 @@ block_type_ulist = "unordered_list"
 block_type_olist = "ordered_list"
 block_type_image = "image"
 
+
 def markdown_to_blocks(markdown):
     """
     Splits a markdown text into blocks.
@@ -108,7 +109,7 @@ def block_to_block_type(block):
     unordered_list_match = re.match(r'^[\*\-]\s+.*', block, re.MULTILINE)
     if unordered_list_match:
         return block_type_ulist
-    
+
     image_match = re.match(r'!\[.*?\]\((.*?)\)', block, re.MULTILINE)
     if image_match:
         return block_type_image
@@ -180,7 +181,7 @@ def image_to_html_node(block):
 
 
 
-    
+
 
 def text_to_children(text):
     text_nodes = text_to_textnodes(text)

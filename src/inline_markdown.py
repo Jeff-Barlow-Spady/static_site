@@ -1,43 +1,38 @@
 import re
 
-from textnode import (
-    TextNode,
-    text_type_text,
-    text_type_bold,
-    text_type_italic,
-    text_type_code,
-    text_type_link,
-    text_type_image,
-)
+from textnode import TextNode, TextType
+
 
 def text_to_textnodes(text):
     """
     Convert a given text into a list of TextNode objects representing the text with different formatting.
-    
+
     Args:
         text (str): The input text to be converted.
-        
+
     Returns:
         list: A list of TextNode objects representing the text with different formatting.
-        
+
     This function takes a given text as input and converts it into a list of TextNode objects. It first creates a single TextNode object with the input text and the text_type_text. Then, it applies different formatting delimiters such as "**" (bold), "*" (italic), and "`" (code) to the text by calling the split_nodes_delimiter function. It also splits the text into image and link nodes by calling the split_nodes_image and split_nodes_link functions respectively. Finally, it returns the list of TextNode objects representing the text with different formatting.
     """
-    nodes = [TextNode(text, text_type_text)]
-    nodes = split_nodes_delimiter(nodes, "**", text_type_bold)
-    nodes = split_nodes_delimiter(nodes, "*", text_type_italic)
-    nodes = split_nodes_delimiter(nodes, "`", text_type_code)
+    nodes = [TextNode(text, TextType.TEXT)]
+    nodes = split_nodes_delimiter(nodes, "**", TextType.BOLD)
+    nodes = split_nodes_delimiter(nodes, "*", TextType.ITALIC)
+    nodes = split_nodes_delimiter(nodes, "_", TextType.ITALIC)
+    nodes = split_nodes_delimiter(nodes, "`", TextType.CODE)
     nodes = split_nodes_image(nodes)
     nodes = split_nodes_link(nodes)
     return nodes
 
-def split_nodes_delimiter(old_nodes, delimiter, text_type):
+
+def split_nodes_delimiter(old_nodes, delimiter, text_type: TextType):
     """
     Split a list of TextNode objects into a new list of TextNode objects based on a given delimiter and text type.
 
     Args:
         old_nodes (list): A list of TextNode objects representing the original text.
         delimiter (str): The delimiter used to split the text into sections.
-        text_type (str): The text type to assign to the sections that are split.
+        text_type (TextType): The text type to assign to the sections that are split.
 
     Returns:
         list: A new list of TextNode objects representing the split text with different formatting.
@@ -49,20 +44,42 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
     """
     new_nodes = []
     for old_node in old_nodes:
-        if old_node.text_type != text_type_text:
+        if old_node.text_type != TextType.TEXT:
             new_nodes.append(old_node)
             continue
         split_nodes = []
-        sections = old_node.text.split(delimiter)
-        if len(sections) % 2 == 0:
-            raise ValueError("Invalid markdown, formatted section not closed")
-        for i in range(len(sections)):
-            if sections[i] == "":
+        # For underscores, use regex to match only word-boundary underscores (not in compound words)
+        if delimiter == "_":
+            # Match underscore followed by non-whitespace, non-underscore, then another underscore
+            # This avoids matching underscores in compound words like "world-building"
+            pattern = r"(?<!\w)_(?!\s)([^_]+?)(?<!\s)_(?!\w)"
+            matches = list(re.finditer(pattern, old_node.text))
+            if len(matches) == 0:
+                new_nodes.append(old_node)
                 continue
-            if i % 2 == 0:
-                split_nodes.append(TextNode(sections[i], text_type_text))
-            else:
-                split_nodes.append(TextNode(sections[i], text_type))
+            # Build sections based on matches
+            last_pos = 0
+            for i, match in enumerate(matches):
+                # Text before the match
+                if match.start() > last_pos:
+                    split_nodes.append(TextNode(old_node.text[last_pos:match.start()], TextType.TEXT))
+                # The italic text (group 1)
+                split_nodes.append(TextNode(match.group(1), text_type))
+                last_pos = match.end()
+            # Text after last match
+            if last_pos < len(old_node.text):
+                split_nodes.append(TextNode(old_node.text[last_pos:], TextType.TEXT))
+        else:
+            sections = old_node.text.split(delimiter)
+            if len(sections) % 2 == 0:
+                raise ValueError("Invalid markdown, formatted section not closed")
+            for i in range(len(sections)):
+                if sections[i] == "":
+                    continue
+                if i % 2 == 0:
+                    split_nodes.append(TextNode(sections[i], TextType.TEXT))
+                else:
+                    split_nodes.append(TextNode(sections[i], text_type))
         new_nodes.extend(split_nodes)
     return new_nodes
 
@@ -84,7 +101,7 @@ def split_nodes_image(old_nodes):
     """
     new_nodes = []
     for old_node in old_nodes:
-        if old_node.text_type != text_type_text:
+        if old_node.text_type != TextType.TEXT:
             new_nodes.append(old_node)
             continue
         original_text = old_node.text
@@ -97,18 +114,19 @@ def split_nodes_image(old_nodes):
             if len(sections) != 2:
                 raise ValueError("Invalid markdown, image section not closed")
             if sections[0] != "":
-                new_nodes.append(TextNode(sections[0], text_type_text))
+                new_nodes.append(TextNode(sections[0], TextType.TEXT))
             new_nodes.append(
                 TextNode(
                     image[0],
-                    text_type_image,
+                    TextType.IMAGE,
                     image[1],
                 )
             )
             original_text = sections[1]
         if original_text != "":
-            new_nodes.append(TextNode(original_text, text_type_text))
+            new_nodes.append(TextNode(original_text, TextType.TEXT))
     return new_nodes
+
 
 def split_nodes_link(old_nodes):
     """
@@ -124,10 +142,10 @@ def split_nodes_link(old_nodes):
         ValueError: If the link section in the markdown is not closed.
 
     This function takes a list of TextNode objects representing the original text and splits it into a new list of TextNode objects based on link markdown. It iterates over each TextNode object in the old_nodes list and checks if its text_type is not equal to text_type_text. If it is not, the TextNode object is appended to the new_nodes list without modification. If it is, the text of the TextNode object is checked for link markdown. If no link markdown is found, the TextNode object is appended to the new_nodes list. If link markdown is found, the text is split into sections using the link markdown. If the number of sections after splitting is not equal to 2, indicating an invalid markdown format, a ValueError is raised. The function then iterates over the sections and creates new TextNode objects with the appropriate text and text_type. The new TextNode objects are appended to the new_nodes list. Finally, the new_nodes list is returned.
-"""
+    """
     new_nodes = []
     for old_node in old_nodes:
-        if old_node.text_type != text_type_text:
+        if old_node.text_type != TextType.TEXT:
             new_nodes.append(old_node)
             continue
         original_text = old_node.text
@@ -140,11 +158,11 @@ def split_nodes_link(old_nodes):
             if len(sections) != 2:
                 raise ValueError("Invalid markdown, link section not closed")
             if sections[0] != "":
-                new_nodes.append(TextNode(sections[0], text_type_text))
-            new_nodes.append(TextNode(link[0], text_type_link, link[1]))
+                new_nodes.append(TextNode(sections[0], TextType.TEXT))
+            new_nodes.append(TextNode(link[0], TextType.LINK, link[1]))
             original_text = sections[1]
         if original_text != "":
-            new_nodes.append(TextNode(original_text, text_type_text))
+            new_nodes.append(TextNode(original_text, TextType.TEXT))
     return new_nodes
 
 

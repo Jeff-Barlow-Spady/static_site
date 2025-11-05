@@ -11,5 +11,4 @@ app = FastAPI()
 static_dir = os.path.join(os.path.dirname(__file__), "public")
 app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
 
-# Run the app  
-
+# Run the app

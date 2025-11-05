@@ -24,14 +24,25 @@ class HotReloadHandler(FileSystemEventHandler):
         os.execv(sys.executable, [sys.executable] + sys.argv)
 
 def find_available_port(port):
-    while True:
-        try:
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                s.bind(("localhost", port))
-                s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-                return port
-        except OSError:
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.bind(("localhost", port))
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            return port
+    except OSError:
+        # If the requested port is not available, try incrementing
+        original_port = port
+        while True:
             port += 1
+            try:
+                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                    s.bind(("localhost", port))
+                    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                    print(f"Port {original_port} is in use, using port {port} instead")
+                    return port
+            except OSError:
+                if port > original_port + 100:  # Safety limit
+                    raise OSError(f"Could not find an available port starting from {original_port}")
 
 def main():
     parser = argparse.ArgumentParser(description="Start an ASGI server with hot-reloading.")

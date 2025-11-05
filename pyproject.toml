@@ -1,0 +1,11 @@
+[project]
+name = "static-site"
+version = "0.1.0"
+description = "Static site generator with markdown support"
+requires-python = ">=3.8"
+dependencies = [
+    "fastapi>=0.100.0",
+    "ty>=0.0.1a25",
+    "uvicorn[standard]>=0.20.0",
+    "watchdog>=3.0.0",
+]

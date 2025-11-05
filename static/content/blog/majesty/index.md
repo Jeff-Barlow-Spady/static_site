@@ -1,87 +1,3 @@
-# Static Site Generator
-
-## Overview
-
-This project is a static site generator written in Python. It takes Markdown content and converts it into HTML, copying static assets and applying templates to create a fully functional static website.
-
-## Installation
-
-This project uses [uv](https://github.com/astral-sh/uv) for dependency management. To install the necessary dependencies, run:
-
-```bash
-uv sync
-```
-
-This will create a virtual environment and install all dependencies automatically.
-
-## Usage
-
-### Setting Up Your Project
-
-1. **Static Assets**: Place your static assets (e.g., images, CSS files) in the `static/` directory.
-2. **Markdown Content**: Place your Markdown content files in the `content/` directory.
-
-### Running the Generator and Serving the Site
-
-To build the static site and serve it locally, follow these steps:
-
-1. **Run the Main Script**:
-This script will:
-
-    ```bash
-    ./main.sh
-
-    ```
-
-    - Convert the Markdown files in `content/` to HTML. This is done recursively. Place your markdown files in subdirectories of `/content`
-    For example: `/content/majesty` will create a page named majesty
-    - Copy the static assets from `static/` to `public/`.
-    - Apply the HTML templates.
-    - Serve the generated site from the `public/` directory.
-
-## Directory and File Descriptions
-
-- **content/**: Directory containing Markdown content files.
-- **main.sh**: Shell script that runs the generator and serves the site.
-- **public/**: Directory where generated HTML and copied static assets are stored.
-- **README.md**: This documentation file.
-- **pyproject.toml**: Project configuration and dependency management (using uv).
-- **server.py**: Script to run a local development server for previewing the generated site (invoked by `main.sh`).
-- **src/**: Contains the core logic and modules of the static site generator.
-    - `copy_static.py`: Script to copy static files to the `public/` directory.
-    - `generate.py`: Script to convert Markdown content into HTML.
-    - `htmlnode.py`, `inline_markdown.py`, `markdown_blocks.py`, `textnode.py`: Modules for handling different aspects of Markdown to HTML conversion.
-    - `main.py`: Main entry point for the generator logic.
-    - `scratch.ipynb`: Jupyter notebook for experimentation and testing.
-    - `test_htmlnode.py`, `test_inline_markdown.py`, `test_markdown_blocks.py`, `test_textnode.py`: Test scripts for the respective modules.
-- **static/**: Directory containing static assets to be included in the generated site.
-    - `images/rivendell.png`: Example image.
-    - `index.css`: Stylesheet.
-- **template.html**: HTML template file used to wrap the generated content.
-- **tests.sh**: Shell script for running the test suite.
-
-## Roadmap
-
-- **Improve File Structure**: Organize the project files and directories for better maintainability.
-- **More Interactivity**: Add features to enhance user interaction and experience.
-- **More Templates**: Create additional HTML templates to provide more design options.
-- **Config:** Add YAML config and front matter to handle metadata
-
-## License
-
-This project is licensed under the MIT License. See the `LICENSE` file for details.
-
-## Acknowledgments
-
-This project is part of a course from [Boot.dev](https://boot.dev/).
-
----
-
-## Examples
-
-![GIF of generated site](gif_preview.gif)
-
-```markdown
 # The Unparalleled Majesty of "The Lord of the Rings"
 
 [Back Home](/)
@@ -106,12 +22,12 @@ One cannot simply discuss *The Lord of the Rings* without acknowledging the bedr
 2. The tragic saga of the Noldor Elves
 3. The rise and fall of great kingdoms such as Gondolin and Númenor
 
-    ```python
-    print("Lord")
-    print("of")
-    print("the")
-    print("Rings")
-    ```
+```
+print("Lord")
+print("of")
+print("the")
+print("Rings")
+```
 
 ## The Art of **World-Building**
 
@@ -150,5 +66,3 @@ The shadow that *The Lord of the Rings* casts over the fantasy genre is both vas
 As we stand at the threshold of this mystical realm, it is clear that *The Lord of the Rings* is not merely a series but a gateway to a world that continues to enchant and inspire. It is a beacon of imagination, a wellspring of wisdom, and a testament to the power of myth. In the grand tapestry of fantasy literature, Tolkien's masterpiece is the gleaming jewel in the crown, unmatched in its majesty and enduring in its legacy. As an Archmage who has traversed the myriad realms of magic and lore, I declare with utmost conviction: *The Lord of the Rings* reigns supreme as the greatest legendarium our world has ever known.
 
 Splendid! Then we have an accord: in the realm of fantasy and beyond, Tolkien's creation is unparalleled, a treasure trove of wisdom, wonder, and the indomitable spirit of adventure that dwells within us all.
-
-```
